@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>کمک‌کننده</title>
+</head>
+<body>
+  <h2>🛰️ در حال دریافت موقعیت شما...</h2>
+  <div id="status">⏳ منتظر موقعیت...</div>
+  <div id="map"></div>
+
+  <script>
+    function sendLocation(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const acc = position.coords.accuracy;
+
+      document.getElementById("status").innerText =
+        `مکان فعلی:\nعرض: ${lat.toFixed(6)}\nطول: ${lon.toFixed(6)}\nدقت: ${acc} متر`;
+
+      // در این نسخه فقط نمایش می‌دهیم، بعداً ارسال هم اضافه می‌شود
+    }
+
+    function handleError(error) {
+      document.getElementById("status").innerText =
+        `❌ خطا در گرفتن موقعیت: ${error.message}`;
+    }
+
+    navigator.geolocation.watchPosition(sendLocation, handleError, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 10000
+    });
+  </script>
+</body>
+</html>
