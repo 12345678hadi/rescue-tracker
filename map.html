@@ -4,25 +4,42 @@
   <meta charset="utf-8">
   <title>نقشه زنده بیمار</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; }
-    #map { width: 100%; height: 100%; }
+    body { margin: 0; }
+    #map { height: 100vh; width: 100vw; }
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    // ساخت نقشه روی ایران
-    const map = L.map('map').setView([32.4279, 53.6880], 5);
+    const map = L.map('map').setView([35.7, 51.4], 15); // موقعیت اولیه: تهران
+    const marker = L.marker([35.7, 51.4]).addTo(map);
 
-    // اضافه کردن نقشه از OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      maxZoom: 19
     }).addTo(map);
+
+    const url = "https://script.google.com/macros/s/AKfycbwBuiOYWXKCETZb3E2bgPw_oN_ouSzKBuUV-mekiWLLu9rMnZL_E0DgYRQQwLkZwUcpng/exec";
+
+    function updateMarker() {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const lat = parseFloat(data.lat);
+          const lon = parseFloat(data.lon);
+          marker.setLatLng([lat, lon]);
+          map.setView([lat, lon]);
+        })
+        .catch(() => {
+          console.log("❌ خطا در دریافت مکان");
+        });
+    }
+
+    setInterval(updateMarker, 1000); // هر ۱ ثانیه
+    updateMarker();
   </script>
 </body>
 </html>
